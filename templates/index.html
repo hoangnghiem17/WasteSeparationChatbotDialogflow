@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chatbot with Top Logos</title>
+    <style>
+        /* Reset margin and padding */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Full height for html and body */
+        html, body {
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Main container to split the screen */
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header for the logos */
+        .header {
+            background-color: #f4f4f9;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        /* Style for the logos */
+        .header img {
+            height: 50px;
+            margin-right: 15px;
+        }
+
+        /* Main content area with iframe */
+        .main {
+            flex-grow: 1; /* Takes up remaining space */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Full height and width iframe */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header section with logos -->
+        <div class="header">
+            <img src="static/frankfurt_logo.png" alt="City of Frankfurt Logo">
+            <img src="static/fes_logo.png" alt="FES Logo">
+            <img src="static/frauas_logo.png" alt="FRA UAS Logo">
+        </div>
+
+        <!-- Main section with Dialogflow chatbot -->
+        <div class="main">
+            <iframe allow="microphone;" src="https://console.dialogflow.com/api-client/demo/embedded/1cdad1d0-9615-40b3-befb-f39eb8cc8441"></iframe>
+        </div>
+    </div>
+</body>
+</html>
