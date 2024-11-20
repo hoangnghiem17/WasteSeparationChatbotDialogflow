@@ -21,17 +21,38 @@ def fulfillment():
     logging.debug(f"Extracted item name: {item_name}")  # Log the extracted item
 
     if item_name:
-        entsorgungsinfo = get_entsorgungsinfo(item_name)
+        entsorgungsinfo = get_entsorgungsinfo(item_name)  # Query database for the item
         if entsorgungsinfo:
             entsorgungsort, adresse, link = entsorgungsinfo
-            response_text = f"Der Entsorgungsort für {item_name} ist {entsorgungsort} bei der folgenden Adresse: {adresse}. Du findest weitere Informationen zu der Adresse hier: {link}"
+
+            # Answer Case 1: All columns are available
+            if adresse and link:
+                response_text = (
+                    f"Der Entsorgungsort für {item_name} ist {entsorgungsort} "
+                    f"bei der folgenden Adresse: {adresse}. "
+                    f"Du findest weitere Informationen zu der Adresse hier: {link}"
+                )
+            # Answer Case 2: Column "Link" is empty
+            elif adresse and not link:
+                response_text = (
+                    f"Der Entsorgungsort für {item_name} ist {entsorgungsort} "
+                    f"bei der folgenden Adresse: {adresse}."
+                )
+            # Case 3: Column "Link" and "Adresse" are empty
+            elif not adresse and not link:
+                response_text = (
+                    f"Der Entsorgungsort für {item_name} ist {entsorgungsort}."
+                )
         else:
+            # No matching row found in the database
             response_text = f"Für {item_name} konnte ich leider keinen Entsorgungsort finden."
     else:
-        response_text = "Bitte nenne mir das Item, welches du entsorgen möchtest."
+        # The parameter "EntsorgungsItem" is missing
+        response_text = "Das zu entsorgende Item wurde nicht erkannt, bitte wiederhole deine Anfrage."
 
     logging.debug(f"Response text: {response_text}")  # Log the response text
     return jsonify({'fulfillmentText': response_text})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
