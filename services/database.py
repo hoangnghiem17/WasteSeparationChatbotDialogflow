@@ -2,7 +2,7 @@ import logging
 
 import sqlite3
 
-def query_disposal_information(item_name: str):
+def query_disposal_information(item_name: str) -> tuple:
     """
     Fetch disposal information from the database for a given item (Abfallart).
 
@@ -20,7 +20,7 @@ def query_disposal_information(item_name: str):
     logging.debug(f"Querying database for item: {item_name}")
     conn = sqlite3.connect('abfallABC_entsorgung.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT Entsorgungsweg, Adresse, Link FROM abfallABC_entsorgung WHERE Abfallart = ?", (item_name,))
+    cursor.execute("SELECT Entsorgungsweg, Adresse, Link FROM abfallABC_entsorgung WHERE LOWER(Abfallart) = LOWER(?)", (item_name,))
     result = cursor.fetchone()
     conn.close()
     logging.debug(f"Query result: {result}")
