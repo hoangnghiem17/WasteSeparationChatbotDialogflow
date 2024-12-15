@@ -27,6 +27,7 @@ def process_waste_item_query():
     else:
         response_text = "Bitte nenne mir das Item, welches du entsorgen möchtest."
     
+    logging.debug(f"Response text: {response_text}")
     return jsonify({'fulfillmentText': response_text})
 
 if __name__ == '__main__':

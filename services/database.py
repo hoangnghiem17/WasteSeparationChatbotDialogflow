@@ -1,27 +1,47 @@
-import logging
-
 import sqlite3
+import logging
+from rapidfuzz import process  # Use rapidfuzz for fuzzy matching
 
-def query_disposal_information(item_name: str) -> tuple:
+def query_disposal_information(item: str) -> tuple:
     """
-    Fetch disposal information from the database for a given item (Abfallart).
+    Fetch disposal information from the database for a given item (Abfallart) using fuzzy matching.
 
     Args:
-        item_name (str): Name of the item to query in the database.
+        item (str): Name of the item to query in the database.
 
     Returns:
-        tuple or None: A tuple containing the disposal information:
+        tuple or None: A tuple containing:
             - Entsorgungsweg (str): The method or place of disposal (e.g., "Recyclingzentrum").
-            - Adresse (str or None): The address of the disposal location, if available.
-            - Link (str or None): A URL with more information, if available.
-            Returns None if no matching row is found.
+            - Adresse (str or None): The address of the disposal location.
+            - Link (str or None): A URL with more information.
+            Returns None if no sufficiently close match is found.
     """
-    
-    logging.debug(f"Querying database for item: {item_name}")
-    conn = sqlite3.connect('abfallABC_entsorgung.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT Entsorgungsweg, Adresse, Link FROM abfallABC_entsorgung WHERE LOWER(Abfallart) = LOWER(?)", (item_name,))
-    result = cursor.fetchone()
-    conn.close()
-    logging.debug(f"Query result: {result}")
-    return result
+    try:
+        logging.debug(f"Querying database for item: {item}")
+        conn = sqlite3.connect("abfallABC_entsorgung.db")
+        cursor = conn.cursor()
+
+        # Fetch all rows and item names (Abfallart)
+        cursor.execute("SELECT Abfallart, Entsorgungsweg, Adresse, Link FROM abfallABC_entsorgung")
+        db_items = cursor.fetchall()
+        conn.close()
+
+        # Extract the names for fuzzy matching
+        item_names = [row[0] for row in db_items]
+        match = process.extractOne(item, item_names, score_cutoff=75)
+
+        if match:
+            best_match = match[0]
+            logging.debug(f"Best match for '{item}': {best_match} with score {match[1]}")
+
+            # Find and return the corresponding row
+            for row in db_items:
+                if row[0] == best_match:
+                    return row[1:]  # Return Entsorgungsweg, Adresse, Link
+        
+        logging.warning(f"No sufficiently close match found for item: {item}")
+        return None
+
+    except Exception as e:
+        logging.error(f"Error querying disposal information: {e}")
+        return None
